@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>TEADEF – Technology-Enabled Anti-Doping Education</title>
+  <link rel="shortcut icon" href="images/icon/favicon.png" type="image/png" />
+  <style>
+    /* ===== Reset & Base ===== */
+    *{box-sizing:border-box;margin:0;padding:0}
+    html,body{height:100%}
+    body{font-family: "Segoe UI", Roboto, Arial, sans-serif;background:#f6f8fb;color:#222;line-height:1.5}
+    a{color:inherit;text-decoration:none}
+    img{max-width:100%;display:block}
+
+    .container{max-width:1100px;margin:0 auto;padding:28px}
+
+    /* ===== NAV ===== */
+    header{position:fixed;left:0;right:0;top:0;z-index:120}
+    nav{display:flex;align-items:center;justify-content:space-between;padding:12px 28px;transition:all .25s ease;background:transparent}
+    nav.scrolled{background:#062a40;color:#fff;box-shadow:0 8px 30px rgba(2,12,30,.25)}
+    .nav-left{display:flex;align-items:center;gap:18px}
+    .logo img{height:42px}
+    .nav-links{display:flex;list-style:none;gap:14px}
+    .nav-links a{padding:6px 8px;border-radius:6px;color:#063048;font-weight:600}
+    .nav-links a.active{color:#ff6b6b}
+    .actions{display:flex;align-items:center;gap:12px}
+    .search-input{padding:8px 10px;border-radius:20px;border:1px solid #d7e2ea;min-width:150px}
+    .btn-get{background:#ff6b6b;color:#fff;padding:8px 14px;border-radius:20px;font-weight:700;border:none;cursor:pointer}
+    .menu-btn{display:none;border:none;background:transparent;cursor:pointer}
+    .menu-icon{height:28px}
+
+    /* ===== HERO ===== */
+    .hero{display:flex;align-items:center;gap:30px;padding-top:110px;padding-bottom:60px}
+    .hero .left{flex:1}
+    .hero h1{font-size:34px;color:#063048;margin-bottom:8px}
+    .lead{font-size:18px;color:#0e3b50;margin-bottom:12px}
+    .summary{color:#2f5566;margin-bottom:16px}
+    .cta{display:flex;gap:12px}
+    .btn{padding:10px 16px;border-radius:8px;font-weight:700;cursor:pointer}
+    .btn.primary{background:#ff6b6b;color:#fff;border:none}
+    .btn.outline{background:transparent;border:2px solid #ff6b6b;color:#ff6b6b}
+
+    .hero .right{flex:1;text-align:center}
+
+    /* ===== SECTIONS ===== */
+    section{padding:48px 0}
+    section.light{background:#fff;border-top:1px solid #eef2f6}
+    h2{font-size:24px;color:#062a40;margin-bottom:8px}
+    .sub{color:#506e79;margin-bottom:18px}
+
+    /* ===== Courses Grid ===== */
+    .courses-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:18px}
+    .course-card{background:#fff;padding:18px;border-radius:12px;box-shadow:0 6px 20px rgba(20,40,60,.06);transition:transform .18s}
+    .course-card:hover{transform:translateY(-6px)}
+    .course-card h3{margin-top:10px;color:#063048}
+    .course-card p{color:#556b74;margin-top:8px;font-size:14px}
+
+    /* ===== Two-column content ===== */
+    .two-col{display:grid;grid-template-columns:1fr 1fr;gap:28px;align-items:center}
+
+    /* ===== Team ===== */
+    .team-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;margin-top:18px}
+    .team-card{background:#fff;padding:18px;border-radius:12px;text-align:center;box-shadow:0 6px 20px rgba(20,40,60,.06)}
+    .team-card img{width:120px;height:120px;border-radius:50%;object-fit:cover;border:5px solid #f4f9fb}
+    .team-card h3{margin-top:10px;color:#063048}
+
+    /* ===== Contact ===== */
+    .contact-grid{display:grid;grid-template-columns:1fr 360px;gap:18px}
+    .contact-form input,.contact-form textarea{width:100%;padding:10px;border-radius:8px;border:1px solid #dce6eb;margin-bottom:12px}
+    .contact-form textarea{min-height:120px;resize:vertical}
+    .contact-info p{color:#374a52}
+    .map-placeholder img{border-radius:8px}
+
+    /* ===== Footer ===== */
+    footer{background:#062a40;color:#fff;padding:28px 0}
+    .footer-grid{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap}
+    .footer-logo{height:46px}
+    .rights{margin-top:10px;font-size:13px;color:#cfe6f1}
+
+    /* ===== Side menu (mobile) ===== */
+    .side-menu{position:fixed;top:0;right:-320px;width:280px;height:100vh;background:#062a40;color:#fff;padding:22px;transition:all .35s;z-index:200}
+    .side-menu.open{right:0}
+    .side-menu .close{display:flex;justify-content:flex-end}
+    .side-menu img.close-btn{height:22px;cursor:pointer}
+    .side-menu .user{margin:18px 0;text-align:center}
+    .side-menu .user img{width:80px;height:80px;border-radius:50%;object-fit:cover;margin-bottom:8px}
+    .side-menu ul{list-style:none;padding-left:0}
+    .side-menu ul li{margin:12px 0}
+    .side-menu ul li a{color:#fff;font-weight:600}
+
+    /* ===== Responsive ===== */
+    @media (max-width:900px){
+      .nav-links{display:none}
+      .menu-btn{display:block}
+      .hero{flex-direction:column;text-align:center;padding-top:90px}
+      .two-col{grid-template-columns:1fr}
+      .contact-grid{grid-template-columns:1fr}
+      .team-grid{grid-template-columns:repeat(auto-fit,minmax(150px,1fr))}
+      .search-input{display:none}
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <nav id="mainNav">
+      <div class="nav-left">
+        <div class="logo"><img src="images/icon/logo.png" alt="logo"></div>
+        <ul class="nav-links" id="navLinks">
+          <li><a href="#home" class="active">Home</a></li>
+          <li><a href="#about">About</a></li>
+          <li><a href="#courses">Modules</a></li>
+          <li><a href="admission.html">Admissions</a></li>
+          <li><a href="#team">Team</a></li>
+          <li><a href="#contact">Contact</a></li>
+        </ul>
+      </div>
+
+      <div class="actions">
+    <input class="search-input" id="searchInput" type="text" placeholder="Search topics..." />
+    
+    <a href="login.html" class="btn-get">Get Started</a>
+
+    <button class="menu-btn" id="menuBtn" aria-label="menu">
+        <img src="images/icon/menu.png" class="menu-icon" alt="menu">
+    </button>
+</div>
+
+
+    <!-- Side menu -->
+    <div class="side-menu" id="sideMenu" aria-hidden="true">
+      <div class="close"><img src="images/icon/close.png" class="close-btn" alt="close" id="closeSide"></div>
+      <div class="user">
+        <img src="images/creator/arati1.jpeg" alt="team">
+        <p><strong>TEADEF</strong></p>
+      </div>
+      <ul>
+        <li><a href="#home" onclick="closeSide()">Home</a></li>
+        <li><a href="#about" onclick="closeSide()">About</a></li>
+        <li><a href="#courses" onclick="closeSide()">Modules</a></li>
+        <li><a href="#team" onclick="closeSide()">Team</a></li>
+        <li><a href="#contact" onclick="closeSide()">Contact</a></li>
+      </ul>
+    </div>
+  </header>
+
+  <!-- HERO -->
+  <main id="home" style="padding-top:94px">
+    <section class="hero container">
+      <div class="left">
+        <h1>Technology-Enabled Anti-Doping Education</h1>
+        <p class="lead">Promoting clean sport through interactive, accessible, and real-time learning.</p>
+        <p class="summary">TEADEF (Technology-Enabled Anti-Doping Education Framework) uses web & mobile platforms, AI-driven personalization, and interactive modules to increase awareness and prevent doping in sport.</p>
+        <div class="cta" style="margin-top:14px">
+          <a class="btn primary" href="#courses">Explore Modules</a>
+          <a class="btn outline" href="https://www.wada-ama.org" target="_blank">WADA Info</a>
+        </div>
+      </div>
+      <div class="right">
+        <img src="images/extra/svg1.jpg" alt="illustration">
+      </div>
+    </section>
+
+    <!-- COURSES -->
+
+
+    <section id="courses" class="container">
+      <h2>Popular Learning Modules</h2>
+      <p class="sub">Interactive modules built for athletes, coaches and support personnel.</p>
+      <div class="courses-grid" role="list">
+        <div class="course-card" role="listitem">
+          <img src="images/courses/book.png" alt="">
+          <h3> <a href="modules/basics.html">Anti-Doping Basics</a></h3>
+          <p>Rules, banned substances, testing overview, and consequences.</p>
+        </div>
+        <div class="course-card" role="listitem">
+          <img src="images/courses/d1.png" alt="">
+          <h3><a href="modules/tue.html">TUE (Therapeutic Use Exemption)</a></h3>
+          <p>How to submit a TUE and when it's appropriate.</p>
+        </div>
+        <div class="course-card" role="listitem">
+          <img src="images/courses/paper.png" alt="">
+          <h3> <a href="modules/testing.html">Testing Procedures</a></h3>
+          <p>What to expect during sample collection and athlete rights.</p>
+        </div>
+        <div class="course-card" role="listitem">
+          <img src="images/courses/projects.png" alt="">
+          <h3> <a href="modules/prevention.html">Prevention & Nutrition</a></h3>
+          <p>Safe supplements, nutrition and avoiding inadvertent doping.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ABOUT -->
+    <section id="about" class="light">
+      <div class="container two-col">
+        <div class="media"><img src="images/extra/e3.jpg" alt="about"></div>
+        <div class="content">
+          <h2>About TEADEF</h2>
+          <p>TEADEF provides continuous and contextual anti-doping education. Our objectives are to:</p>
+          <ul>
+            <li>Provide accurate, up-to-date anti-doping information (WADA/NADA updates)</li>
+            <li>Deliver interactive learning modules and quizzes to boost retention</li>
+            <li>Offer personalized learning paths using analytics</li>
+            <li>Support multilingual access and offline caching for low-connectivity areas</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- TEAM -->
+    <section id="team" class="container">
+      <h2>Meet the Team</h2>
+      <div class="team-grid">
+        <div class="team-card">
+          <img src="images/creator/arati1.jpeg" alt="Arati">
+          <h3>Arati Mankyal</h3>
+          <p>Lead — Content & Research</p>
+        </div>
+        <div class="team-card">
+          <img src="images/creator/babi1.jpeg" alt="Babitha">
+          <h3>R. V. Babitha</h3>
+          <p>Coordinator — Platform & Outreach</p>
+        </div>
+        <div class="team-card">
+          <img src="images/creator/diks1.jpeg" alt="Dikshith">
+          <h3>Dikshith S</h3>
+          <p>Frontend & UI</p>
+        </div>
+        <div class="team-card">
+          <img src="images/creator/roshan.jpeg" alt="Nithya">
+          <h3>Ms. Nithya B. A</h3>
+          <p>Guide — Academic & Quality</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- CONTACT -->
+    <section id="contact" class="light">
+      <div class="container">
+        <h2>Contact & Feedback</h2>
+        <p class="sub">Send us your queries or feedback. This demo stores submissions locally in the browser (no backend).</p>
+        <div class="contact-grid">
+          <form id="contactForm" class="contact-form" novalidate>
+            <div style="display:flex;gap:10px">
+              <input type="text" name="firstName" placeholder="First Name *" required>
+              <input type="text" name="lastName" placeholder="Last Name *" required>
+            </div>
+            <input type="email" name="email" placeholder="Email *" required>
+            <input type="text" name="subject" placeholder="Subject">
+            <textarea name="message" placeholder="Message *" required></textarea>
+            <button class="btn primary" type="submit">Send Message</button>
+          </form>
+
+          <aside class="contact-info">
+            <h3>Get in touch</h3>
+            <p><strong>Address:</strong> Presidency University, Itgalpura, Rajanukunte, Bengaluru</p>
+            <p><strong>Email:</strong> learnedonline9419@gmail.com</p>
+            <p><strong>Phone:</strong> +91-1234-567-890</p>
+            <div class="map-placeholder" style="margin-top:12px"><img src="images/extra/map-placeholder.png" alt="map"></div>
+          </aside>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="container footer-grid">
+      <div>
+        <img src="images/icon/logo - Copy.png" class="footer-logo" alt="logo">
+        <p style="margin-top:8px">TEADEF — Technology-Enabled Anti-Doping Education Framework</p>
+        <p class="rights">© 2025 Arati Mankyal, R. V. Babitha, Dikshith S & Ms. Nithya B. A</p>
+      </div>
+
+      <div>
+        <h3 style="color:#fff;margin-bottom:8px">Subscribe</h3>
+        <form id="newsletterForm">
+          <input type="email" id="newsletterEmail" placeholder="Enter your email" required style="padding:8px;border-radius:6px;border:none;margin-right:8px">
+          <button class="btn" type="submit">Subscribe</button>
+        </form>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ===== JavaScript ===== -->
+  <script>
+    (function(){
+      // DOM helpers
+      const nav = document.getElementById('mainNav');
+      const sideMenu = document.getElementById('sideMenu');
+      const menuBtn = document.getElementById('menuBtn');
+      const closeSideBtn = document.getElementById('closeSide');
+      const contactForm = document.getElementById('contactForm');
+      const newsletterForm = document.getElementById('newsletterForm');
+      const searchInput = document.getElementById('searchInput');
+
+      // NAV: color on scroll
+      function onScroll(){
+        if(window.scrollY > 12) nav.classList.add('scrolled');
+        else nav.classList.remove('scrolled');
+      }
+      window.addEventListener('scroll', onScroll, {passive:true});
+      onScroll();
+
+      // Side menu open/close
+      function openSide(){ sideMenu.classList.add('open'); sideMenu.setAttribute('aria-hidden','false'); }
+      function closeSide(){ sideMenu.classList.remove('open'); sideMenu.setAttribute('aria-hidden','true'); }
+      window.openSide = openSide; window.closeSide = closeSide; // expose for inline onclick if used
+
+      if(menuBtn) menuBtn.addEventListener('click', ()=> openSide());
+      if(closeSideBtn) closeSideBtn.addEventListener('click', ()=> closeSide());
+
+      // Close side on outside click (small)
+      document.addEventListener('click', function(e){
+        if(sideMenu.classList.contains('open') && !sideMenu.contains(e.target) && !menuBtn.contains(e.target)){
+          closeSide();
+        }
+      });
+
+      // Contact form: demo behaviour (stores to localStorage for demo)
+      if(contactForm){
+        contactForm.addEventListener('submit', function(e){
+          e.preventDefault();
+          const fd = new FormData(contactForm);
+          const data = {
+            ts: new Date().toISOString(),
+            firstName: fd.get('firstName') || '',
+            lastName: fd.get('lastName') || '',
+            email: fd.get('email') || '',
+            subject: fd.get('subject') || '',
+            message: fd.get('message') || ''
+          };
+          // basic validation
+          if(!data.firstName || !data.email || !data.message){
+            alert('Please fill required fields: First Name, Email, Message.');
+            return;
+          }
+          // store locally (demo). In real app, POST to server endpoint.
+          const list = JSON.parse(localStorage.getItem('teadef_contacts') || '[]');
+          list.push(data);
+          localStorage.setItem('teadef_contacts', JSON.stringify(list));
+          alert('Thanks! Your message has been saved (demo).');
+          contactForm.reset();
+        });
+      }
+
+      // Newsletter demo
+      if(newsletterForm){
+        newsletterForm.addEventListener('submit', function(e){
+          e.preventDefault();
+          const email = document.getElementById('newsletterEmail').value || '';
+          if(!email){
+            alert('Please enter an email.');
+            return;
+          }
+          // save demo list
+          const n = JSON.parse(localStorage.getItem('teadef_news') || '[]');
+          n.push({email: email, ts: new Date().toISOString()});
+          localStorage.setItem('teadef_news', JSON.stringify(n));
+          alert('Subscribed — thank you!');
+          newsletterForm.reset();
+        });
+      }
+
+      // Optional: focus search on small screens when search input clicked
+      if(searchInput){
+        searchInput.addEventListener('focus', ()=> searchInput.select());
+      }
+
+      // Smooth scroll to anchors
+      document.querySelectorAll('a[href^="#"]').forEach(a=>{
+        a.addEventListener('click', function(e){
+          const href = this.getAttribute('href');
+          if(href.length > 1){
+            const target = document.querySelector(href);
+            if(target){
+              e.preventDefault();
+              window.scrollTo({top: target.offsetTop - 84, behavior: 'smooth'});
+              closeSide();
+            }
+          }
+        });
+      });
+
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,445 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Admissions — Live Updates</title>
+
+  <style>
+    /* --- Colors matched to index.html: soft light theme --- */
+    :root{
+      --page-bg: #f6f8fb;      /* site background */
+      --card-bg: #ffffff;
+      --muted: #6c7a83;
+      --text: #0b2a2f;
+      --accent: #ff6b6b;       /* index's accent */
+      --accent-2: #062a40;     /* index scrolled nav color */
+      --glass: rgba(2,12,30,0.04);
+      --radius:12px;
+    }
+
+    /* Reset & base */
+    *{box-sizing:border-box;margin:0;padding:0}
+    html,body{height:100%}
+    body{
+      font-family: "Segoe UI", Roboto, Arial, sans-serif;
+      background:var(--page-bg);
+      color:var(--text);
+      line-height:1.45;
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+    }
+
+    .container{max-width:1100px;margin:28px auto;padding:20px}
+
+    /* Header / nav (simple) */
+    header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}
+    .brand{display:flex;align-items:center;gap:12px}
+    .logo{width:56px;height:56px;border-radius:10px;background:linear-gradient(135deg,var(--accent),#ff8b8b);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800}
+    h1{font-size:20px;margin:0}
+    .subtitle{color:var(--muted);font-size:13px}
+
+    .nav-actions{display:flex;align-items:center;gap:10px}
+    a.btn{padding:8px 12px;border-radius:18px;text-decoration:none;font-weight:700}
+    .btn-ghost{background:transparent;border:1px solid var(--glass);color:var(--text)}
+    .btn-primary{background:var(--accent);color:#fff}
+
+    /* Layout */
+    .layout{display:grid;grid-template-columns:1fr 360px;gap:18px}
+    @media (max-width:980px){ .layout{grid-template-columns:1fr} }
+
+    /* Card */
+    .card{background:var(--card-bg);border-radius:var(--radius);padding:16px;box-shadow:0 8px 20px rgba(18,38,48,0.06);border:1px solid #eef2f6}
+    .muted{color:var(--muted);font-size:13px}
+
+    /* Form */
+    .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+    @media (max-width:640px){ .form-grid{grid-template-columns:1fr} }
+    label{display:block;font-size:13px;color:var(--text)}
+    input[type="text"], input[type="email"], input[type="tel"], select{
+      width:100%;padding:10px;border-radius:10px;border:1px solid #dfe8ec;background:#fbfdfe;font-size:14px;margin-top:6px;color:var(--text);
+    }
+    input:focus, select:focus{outline:none;border-color:var(--accent);box-shadow:0 6px 16px rgba(255,107,107,0.08)}
+
+    .form-actions{display:flex;gap:10px;margin-top:12px;align-items:center}
+    .chip{padding:8px 10px;border-radius:10px;background:#f3f7f9;border:1px solid #e6eef3;cursor:pointer;font-weight:600;font-size:13px}
+
+    /* Feed */
+    .feed-list{max-height:420px;overflow:auto;margin-top:12px;display:flex;flex-direction:column-reverse;gap:10px;padding:6px}
+    .feed-item{display:flex;gap:12px;align-items:flex-start;padding:12px;border-radius:10px;background:#fcfeff;border:1px solid #eef6f8}
+    .avatar{min-width:46px;height:46px;border-radius:10px;background:linear-gradient(135deg,#ffd4d4,var(--accent));display:flex;align-items:center;justify-content:center;font-weight:700;color:#942929}
+    .feed-content strong{display:block;margin-bottom:6px;color:#07323a}
+    .feed-meta{font-size:12px;color:var(--muted)}
+
+    /* Programs table */
+    table{width:100%;border-collapse:collapse;margin-top:12px}
+    th,td{padding:10px;text-align:left;border-bottom:1px solid #f1f6f8;font-size:14px;color:#0b2a2f}
+    .prog-row .prog-name{font-weight:700}
+    .progress-wrap{width:100%;height:10px;background:#f2f6f7;border-radius:999px;overflow:hidden;margin-top:6px}
+    .progress-bar{height:100%;background:linear-gradient(90deg,var(--accent),#ff8b8b);width:20%;transition:width .6s ease}
+
+    /* Snapshot */
+    .snapshot{display:flex;flex-direction:column;gap:12px}
+    .stat{display:flex;justify-content:space-between;align-items:center;padding:10px;border-radius:8px;background:#fff;border:1px solid #eef2f6}
+    .stat strong{font-size:18px;color:#063048}
+
+    pre{background:#fbfdfe;border-radius:8px;padding:10px;border:1px solid #eef6f8;color:#163a3a;font-size:13px;overflow:auto}
+
+    /* small helpers */
+    .small{font-size:13px}
+    .right{display:flex;justify-content:flex-end;align-items:center}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="brand">
+        <div class="logo">AD</div>
+        <div>
+          <h1>Admissions</h1>
+          <div class="subtitle">Live updates • Manage applicants • Seats overview</div>
+        </div>
+      </div>
+
+      <div class="nav-actions">
+        <a href="index.html" class="btn btn-ghost">← Home</a>
+        <a href="login.html" class="btn btn-primary">Login</a>
+      </div>
+    </header>
+
+    <div class="layout">
+      <!-- Left column -->
+      <main>
+        <!-- Admission form -->
+        <section class="card" aria-labelledby="formTitle">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <div>
+              <h2 id="formTitle">Add Admission Manually</h2>
+              <div class="muted small">Add a student — updates feed, seats and stats instantly.</div>
+            </div>
+            <div class="small">Simulated feed</div>
+          </div>
+
+          <form id="manualForm" style="margin-top:12px">
+            <div class="form-grid">
+              <div>
+                <label for="mfName">Full name</label>
+                <input id="mfName" type="text" placeholder="e.g., Ananya Kumar" required />
+              </div>
+              <div>
+                <label for="mfProgram">Program</label>
+                <select id="mfProgram" required></select>
+              </div>
+              <div>
+                <label for="mfEmail">Email (optional)</label>
+                <input id="mfEmail" type="email" placeholder="student@example.com" />
+              </div>
+              <div>
+                <label for="mfPhone">Phone (optional)</label>
+                <input id="mfPhone" type="tel" placeholder="+91 9XXXXXXXXX" />
+              </div>
+            </div>
+
+            <div style="display:flex;gap:10px;margin-top:12px;align-items:center">
+              <select id="mfType" style="padding:10px;border-radius:10px;border:1px solid #dfe8ec;background:#fbfdfe">
+                <option>Merit</option><option>Management</option><option>Sports Quota</option><option>Scholarship</option>
+              </select>
+
+              <button type="submit" class="btn btn-primary">Add Admission</button>
+              <button type="button" id="btn-seed-manual" class="chip">Quick Seed</button>
+
+              <div style="flex:1"></div>
+              <button type="button" id="btn-export" class="chip">Export JSON</button>
+            </div>
+          </form>
+        </section>
+
+        <!-- Live feed -->
+        <section class="card" style="margin-top:16px">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <div>
+              <h2 style="margin:0">Live Admission Feed</h2>
+              <div class="muted small">Newest events appear on top.</div>
+            </div>
+
+            <div style="display:flex;gap:8px;align-items:center">
+              <div class="chip" id="btn-pause">Pause</div>
+              <div class="chip" id="btn-clear">Clear</div>
+              <div class="chip" id="btn-seed">Seed Event</div>
+            </div>
+          </div>
+
+          <div style="display:flex;gap:8px;margin-top:12px">
+            <div class="chip" id="filterAll">All</div>
+            <div class="chip" id="filterNew">Applicants</div>
+            <div class="chip" id="filterStatus">Status</div>
+          </div>
+
+          <div class="feed-list" id="liveFeed" aria-live="polite" tabindex="0">
+            <!-- items inserted here -->
+          </div>
+        </section>
+
+        <!-- Programs table -->
+        <section class="card" style="margin-top:16px">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <div>
+              <h2 style="margin:0">Programs & Seats</h2>
+              <div class="muted small">Progress bars show how full each program is.</div>
+            </div>
+            <div class="small muted">Auto-update</div>
+          </div>
+
+          <table id="programTable" aria-describedby="programsDesc">
+            <thead>
+              <tr><th>Program</th><th>Quota</th><th style="width:120px">Filled</th><th style="width:120px">Status</th></tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+          <p id="programsDesc" class="muted small" style="margin-top:8px">Table updates in real-time as applications arrive.</p>
+        </section>
+      </main>
+
+      <!-- Right column -->
+      <aside>
+        <div class="card snapshot">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <div>
+              <h3 style="margin:0">Realtime Snapshot</h3>
+              <div class="muted small">Simulated — refreshes every 4s</div>
+            </div>
+            <div class="small muted">Preview</div>
+          </div>
+
+          <div class="stat"><span class="muted">Total Applications</span><strong id="statTotal">0</strong></div>
+          <div class="stat"><span class="muted">New Today</span><strong id="statToday">0</strong></div>
+          <div class="stat"><span class="muted">Open Programs</span><strong id="statOpen">0</strong></div>
+        </div>
+
+        <div class="card" style="margin-top:12px">
+          <h3 style="margin:0">Sample Data</h3>
+          <div class="muted small">Copy or export the current snapshot.</div>
+          <pre id="sampleJson" style="margin-top:10px;max-height:360px"></pre>
+        </div>
+      </aside>
+    </div>
+  </div>
+
+  <script>
+  (function(){
+    /* ---------- SAMPLE DATA (same logical structure) ---------- */
+    const programs = [
+      { id: 'BSC-CS', name: 'B.Sc. Computer Science', quota: 120, filled: 98, status: 'open' },
+      { id: 'BBA', name: 'BBA', quota: 80, filled: 80, status: 'closing' },
+      { id: 'BCom', name: 'B.Com', quota: 100, filled: 60, status: 'open' },
+      { id: 'BA', name: 'B.A. (Economics)', quota: 60, filled: 55, status: 'open' },
+      { id: 'MCA', name: 'MCA', quota: 40, filled: 40, status: 'closed' }
+    ];
+
+    let feed = [
+      { ts: isoAdd(-45), type: 'applicant', program: 'BSC-CS', details: 'New application: Ananya K (Merit)' },
+      { ts: isoAdd(-120), type: 'status', program: 'BBA', details: 'BBA moved to CLOSING (few seats left)' },
+      { ts: isoAdd(-3600), type: 'applicant', program: 'BCom', details: 'New application: Ravi T (Score: 78)' }
+    ];
+
+    /* ---------- DOM refs ---------- */
+    const liveFeed = document.getElementById('liveFeed');
+    const tableBody = document.querySelector('#programTable tbody');
+    const statTotal = document.getElementById('statTotal');
+    const statToday = document.getElementById('statToday');
+    const statOpen = document.getElementById('statOpen');
+    const sampleJson = document.getElementById('sampleJson');
+    const mfProgram = document.getElementById('mfProgram');
+    const manualForm = document.getElementById('manualForm');
+
+    /* ---------- STATE ---------- */
+    let running = true;
+    let totalApps = programs.reduce((s,p)=>s+p.filled,0);
+    let appsToday = 12;
+    let filterMode = 'all'; // all | applicant | status
+
+    /* ---------- UTIL ---------- */
+    function isoAdd(secondsOffset){ return new Date(Date.now() + secondsOffset*1000).toISOString(); }
+    function fmtTime(iso){ return new Date(iso).toLocaleString(); }
+    function clamp(v,min,max){ return Math.max(min,Math.min(max,v)); }
+    function escapeHtml(s){ return (''+s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c])); }
+    function sampleName(){ const a=['Ananya','Ravi','Priya','Karthik','Neha','Aman','Sahil','Riya','Rahul','Sneha']; const b=['K','Sharma','R','Patel','Iyer','Kumar','Das','Gowda','Mehta']; return a[Math.floor(Math.random()*a.length)]+' '+b[Math.floor(Math.random()*b.length)]; }
+
+    /* ---------- RENDER ---------- */
+    function renderPrograms(){
+      tableBody.innerHTML = '';
+      programs.forEach(p=>{
+        const percent = Math.round((p.filled / p.quota) * 100);
+        const tr = document.createElement('tr');
+        tr.className = 'prog-row';
+        tr.innerHTML = `
+          <td class="prog-name">${escapeHtml(p.name)}
+            <div class="progress-wrap" aria-hidden="true"><div class="progress-bar" style="width:${clamp(percent,0,100)}%"></div></div>
+          </td>
+          <td>${p.quota}</td>
+          <td>${p.filled} (${percent}%)</td>
+          <td><div style="font-weight:700;color:#063048">${p.status.toUpperCase()}</div></td>
+        `;
+        tableBody.appendChild(tr);
+      });
+      // little animation
+      document.querySelectorAll('.progress-bar').forEach((el,i)=>el.style.transitionDelay = (i*40)+'ms');
+    }
+
+    function renderStats(){
+      statTotal.textContent = totalApps;
+      statToday.textContent = appsToday;
+      statOpen.textContent = programs.filter(p=>p.status==='open').length;
+    }
+
+    function renderFeed(){
+      liveFeed.innerHTML = '';
+      const display = feed.slice().sort((a,b)=> new Date(b.ts)-new Date(a.ts)).filter(it=>{
+        if(filterMode==='all') return true;
+        if(filterMode==='applicant') return it.type==='applicant';
+        if(filterMode==='status') return it.type==='status';
+      });
+      display.forEach(item=>{
+        const avatarText = (item.details.split(':')[1] || '').split('—')[0] || item.details;
+        const initials = avatarText.trim().split(/\s+/).slice(0,2).map(s=>s[0]).join('').toUpperCase().slice(0,2);
+        const div = document.createElement('div');
+        div.className = 'feed-item';
+        div.innerHTML = `
+          <div class="avatar">${escapeHtml(initials || 'NA')}</div>
+          <div class="feed-content">
+            <strong>${escapeHtml(item.details)}</strong>
+            <div class="feed-meta">${fmtTime(item.ts)} • ${escapeHtml(item.type)}</div>
+          </div>
+        `;
+        liveFeed.appendChild(div);
+      });
+    }
+
+    function renderSampleJson(){
+      const j = { generatedAt: new Date().toISOString(), programs: JSON.parse(JSON.stringify(programs)), feed: feed.slice().sort((a,b)=> new Date(a.ts)-new Date(b.ts)).slice(-300) };
+      sampleJson.textContent = JSON.stringify(j, null, 2);
+    }
+
+    /* ---------- Simulated realtime ---------- */
+    function generateEvent(){
+      const r = Math.random();
+      const p = programs[Math.floor(Math.random()*programs.length)];
+      if(!p) return;
+      const now = new Date().toISOString();
+
+      if(r < 0.68 && p.status !== 'closed'){
+        p.filled = Math.min(p.quota, p.filled + 1);
+        totalApps += 1; appsToday += 1;
+        const name = sampleName();
+        const details = `New application: ${name} — ${p.name}`;
+        feed.push({ ts: now, type: 'applicant', program: p.id, details });
+        if(p.filled >= p.quota){
+          p.status = 'closed';
+          feed.push({ ts: isoAdd(1), type: 'status', program: p.id, details: `${p.name} marked CLOSED (quota filled)` });
+        } else if(p.quota - p.filled <= 5 && p.status !== 'closing'){
+          p.status = 'closing';
+          feed.push({ ts: isoAdd(1), type: 'status', program: p.id, details: `${p.name} moved to CLOSING (seats left: ${p.quota - p.filled})` });
+        }
+      } else {
+        const choices = ['open','closing','closed'];
+        let next = choices[Math.floor(Math.random()*choices.length)];
+        if(p.status === 'closed') next = 'closed';
+        if(p.status === 'open' && Math.random() < 0.6) next = ['open','closing'][Math.floor(Math.random()*2)];
+        p.status = next;
+        feed.push({ ts: now, type: 'status', program: p.id, details: `${p.name} status updated to ${next.toUpperCase()}` });
+      }
+
+      if(feed.length > 800) feed = feed.slice(feed.length - 800);
+      renderPrograms(); renderStats(); renderFeed(); renderSampleJson();
+    }
+
+    /* ---------- Interval ---------- */
+    let intervalId = setInterval(()=>{ if(running) generateEvent(); }, 4000);
+
+    /* ---------- Controls ---------- */
+    document.getElementById('btn-pause').addEventListener('click', ()=>{
+      running = !running;
+      document.getElementById('btn-pause').textContent = running ? 'Pause' : 'Resume';
+    });
+    document.getElementById('btn-clear').addEventListener('click', ()=>{
+      feed = [];
+      renderFeed(); renderSampleJson();
+    });
+    document.getElementById('btn-seed').addEventListener('click', ()=>{
+      feed.push({ ts: new Date().toISOString(), type: 'applicant', program: 'BCom', details: 'Manual seed: Demo applicant — B.Com' });
+      const p = programs.find(x=>x.id==='BCom'); if(p) p.filled = Math.min(p.quota, p.filled + 1);
+      totalApps++; appsToday++;
+      renderPrograms(); renderStats(); renderFeed(); renderSampleJson();
+    });
+
+    document.getElementById('filterAll').addEventListener('click', ()=>{ filterMode='all'; renderFeed(); });
+    document.getElementById('filterNew').addEventListener('click', ()=>{ filterMode='applicant'; renderFeed(); });
+    document.getElementById('filterStatus').addEventListener('click', ()=>{ filterMode='status'; renderFeed(); });
+
+    document.getElementById('btn-seed-manual').addEventListener('click', ()=>{
+      const name = sampleName();
+      const p = programs[Math.floor(Math.random()*programs.length)];
+      feed.push({ ts: new Date().toISOString(), type: 'applicant', program: p.id, details: `Quick seed: ${name} — ${p.name}`});
+      p.filled = Math.min(p.quota, p.filled + 1);
+      totalApps++; appsToday++;
+      renderPrograms(); renderStats(); renderFeed(); renderSampleJson();
+    });
+
+    document.getElementById('btn-export').addEventListener('click', ()=>{
+      const data = { generatedAt: new Date().toISOString(), programs: JSON.parse(JSON.stringify(programs)), feed: feed.slice().sort((a,b)=>new Date(a.ts)-new Date(b.ts)) };
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a'); a.href = url; a.download = 'admissions_snapshot.json'; a.click(); URL.revokeObjectURL(url);
+    });
+
+    /* ---------- Manual form handler ---------- */
+    function populateProgramSelect(){
+      mfProgram.innerHTML = '';
+      programs.forEach(p => {
+        const opt = document.createElement('option'); opt.value = p.id; opt.textContent = p.name; mfProgram.appendChild(opt);
+      });
+    }
+
+    manualForm.addEventListener('submit', (e)=>{
+      e.preventDefault();
+      const name = (document.getElementById('mfName').value || '').trim();
+      const email = (document.getElementById('mfEmail').value || '').trim();
+      const phone = (document.getElementById('mfPhone').value || '').trim();
+      const pid = (document.getElementById('mfProgram').value || '').trim();
+      const type = (document.getElementById('mfType').value || '').trim();
+
+      if(!name || !pid){ alert('Please enter name and select program.'); return; }
+      const program = programs.find(p=>p.id===pid);
+      if(!program){ alert('Program not found'); return; }
+
+      if(program.filled < program.quota) program.filled += 1;
+      else program.status = 'closed';
+      totalApps++; appsToday++;
+
+      const now = new Date().toISOString();
+      const details = `New application (manual): ${name} — ${program.name}${email ? ' • ' + email : ''}${phone ? ' • ' + phone : ''}`;
+      feed.push({ ts: now, type: 'applicant', program: program.id, details });
+
+      if(program.filled >= program.quota && program.status !== 'closed'){
+        program.status = 'closed';
+        feed.push({ ts: isoAdd(1), type: 'status', program: program.id, details: `${program.name} marked CLOSED (quota filled)`});
+      }
+
+      renderPrograms(); renderStats(); renderFeed(); renderSampleJson();
+      manualForm.reset();
+      alert('Admission added successfully!');
+    });
+
+    /* ---------- Initial render ---------- */
+    populateProgramSelect();
+    renderPrograms();
+    renderStats();
+    renderFeed();
+    renderSampleJson();
+
+    /* ---------- helpers ---------- */
+    function isoAdd(s){ return new Date(Date.now() + s*1000).toISOString(); }
+  })();
+  </script>
+</body>
+</html>
